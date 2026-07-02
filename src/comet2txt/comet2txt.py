@@ -1,9 +1,10 @@
-# comet2txt.py v1.0 - Convert Comet assembler source code to text
+# comet2txt.py - convert Comet assembler source code to text
 #
 # https://github.com/simonowen/comet2txt/
 
-import sys
 import argparse
+import sys
+from importlib.metadata import PackageNotFoundError, version
 
 max_label_len = 14  # Comet hard limit
 token_base = 0x80
@@ -21,15 +22,14 @@ tokens = [
     'SRA', 'SRL', 'SUB', 'XOR', 'Z']
 
 
-# Parse a line of tokenised source code.
-def parse_line(data):
+def convert_line(data: bytes, quiet=True) -> str:
+    """Convert a line of tokenised source code to text."""
     out_line = ''
     has_indent1 = has_indent2 = False
 
     while True:
         if len(data) == 0:
-            print("Line missing null terminator", file=sys.stderr)
-            break
+            raise ValueError("line missing null terminator")
 
         # End of line terminator
         if data[0] == 0:
@@ -76,21 +76,23 @@ def parse_line(data):
 
         # Unhandled token (should be none in valid file)
         else:
-            print(f"Ignoring unknown token: {data[0]:02X}", file=sys.stderr)
+            if not quiet:
+                print(f"ignoring unknown token: {data[0]:02X}", file=sys.stderr)
             data = data[1:]
             break
 
     if len(data) > 0:
-        print(f"Data after line end: {data.hex()}", file=sys.stderr)
+        if not quiet:
+            print(f"data after line end: {data.hex()}", file=sys.stderr)
 
+    out_line = out_line.replace('\x7f', '(c)')
     return out_line.rstrip()
 
 
-# Parse the content of .S source file.
-def parse_file(data):
+def convert_data(data: bytes, quiet=True) -> list[str]:
+    """Convert the content of a .S source file to a list of text lines."""
     if data[0:1] != b'\x00':
-        print("Unexpected file start", file=sys.stderr)
-        return []
+        raise ValueError("unexpected file start")
     data = data[1:]
 
     out_lines = []
@@ -102,29 +104,49 @@ def parse_file(data):
         if line_len == 0:
             break
 
-        out_lines.append(parse_line(line_data))
+        out_lines.append(convert_line(line_data, quiet))
 
     if data != b'\x00':
-        print("Unexpected file end", file=sys.stderr)
+        raise ValueError("unexpected file end")
 
     return out_lines
 
 
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Convert Comet assembler source to text")
-    parser.add_argument("input_file", help="Input .S file to convert")
-    parser.add_argument("output_file", nargs="?", default='', help="Output .asm file to write")
+def convert_file(filename: str, quiet=True) -> list[str]:
+    """Open and convert a .S source file by filename."""
+    with open(filename, "rb") as f:
+        data = f.read()
+    return convert_data(data, quiet)
+
+
+def main():
+    """Main entry point for command line usage."""
+    try:
+        pkg_version = version('comet2txt')
+    except PackageNotFoundError:
+        pkg_version = 'unknown'
+
+    parser = argparse.ArgumentParser(prog="comet2txt", description="Convert Comet assembler source to text")
+    parser.add_argument("input_file", help="input .S file to convert")
+    parser.add_argument("output_file", nargs="?", default='', help="output .asm file to write")
+    parser.add_argument("-q", "--quiet", action="store_true", default=False, help="suppress conversion warnings")
+    parser.add_argument('-V', '--version', action='version', version=f'%(prog)s {pkg_version}')
     args = parser.parse_args()
 
-    with open(args.input_file, "rb") as f:
-        input_data = f.read()
+    try:
+        out_lines = convert_file(args.input_file, args.quiet)
 
-    out_lines = parse_file(input_data)
-
-    if args.output_file:
-        with open(args.output_file, "w") as f:
+        if args.output_file:
+            with open(args.output_file, "w") as f:
+                for line in out_lines:
+                    f.write(line + "\n")
+        else:
             for line in out_lines:
-                f.write(line + "\n")
-    else:
-        for line in out_lines:
-            print(line)
+                print(line)
+    except Exception as e:
+        print(e, file=sys.stderr)
+        sys.exit(1)
+
+
+if __name__ == "__main__":
+    main()

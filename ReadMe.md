@@ -1,33 +1,52 @@
 # comet2txt
 
-A Python script to convert SAM Coupé Comet assembler code to ASCII text.
+A Python program to convert SAM Coupé Comet assembler code to ASCII text.
 
 The output text can be assembled using pyz80 for easier SAM development on
 modern operating systems.
 
+## Installation
+
+Installing the tool doesn't require the source code or even Python, just uv.
+
+Install [uv](https://docs.astral.sh/uv/#installation) if not already installed.
+Windows users can do that using:
+
+```shell
+winget install --id=astral-sh.uv -e
+```
+
+Then install the `comet2txt` command using:
+
+```shell
+uv tool install comet2txt
+```
+
 ## Usage
 
 ```sh
-usage: comet2txt.py [-h] input_file [output_file]
+usage: comet2txt [-h] [-q] [-V] input_file [output_file]
 
 Convert Comet assembler source to text
 
 positional arguments:
-  input_file   Input .S file to convert
-  output_file  Output .asm file to write
+  input_file            input .S file to convert
+  output_file           output .asm file to write
 
 options:
-  -h, --help   show this help message and exit
+  -h, --help            show this help message and exit
+  -q, --quiet           suppress conversion warnings
+  -V, --version         show program's version number and exit
 ```
 
 The input file is a .S file containing your Comet source code. Use `SCADM` or
 `SamDsk` (not to be confused with SAMdisk!) to extract this from a disk image.
 
-If an output file is not supplied the converted output is written to the console.
+If no output file is supplied the converted output is written to the console.
 
 ## Alternatives
 
-Here are some existing solitions to perform the conversion, each with drawbacks:
+Here are some existing solutions to perform the conversion, each with drawbacks:
 
 ### COMET2A
 
@@ -64,16 +83,18 @@ final 2 characters of long comments may be lost during printing.
 
 ## ChangeLog
 
-### 2025-05-05
-- Initial release
+### 2026-07-03
 
+- Released as PyPi package v1.0.0, with API and CLI interfaces.
+- Upgraded project development and build environment.
+
+### 2025-05-05
+
+- Initial commit.
 
 ## Links
 
-pyz80 - https://github.com/simonowen/pyz80/ (best used via VSCode extension)  
-SCADM - https://www.worldofsam.org/products/scadm  
-SimCoupe - https://simonowen.com/simcoupe/
-
-----
-
-https://github.com/simonowen/comet2txt/
+comet2txt - <https://github.com/simonowen/comet2txt/>
+pyz80 - <https://github.com/simonowen/pyz80/> (best used via VSCode extension)  
+SCADM - <https://www.worldofsam.org/products/scadm>  
+SimCoupe - <https://simonowen.com/simcoupe/>
