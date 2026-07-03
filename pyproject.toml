@@ -53,11 +53,11 @@ dev = [
 
 [tool.pytest.ini_options]
 minversion = "7.0"
-addopts = "-ra -q --cov=comet2txt --cov-report=term-missing"
+addopts = "-ra -q --cov --cov-report=term-missing"
 testpaths = ["tests"]
 
 [tool.coverage.run]
-source = ["comet2txt"]
+source_pkgs = ["comet2txt"]
 
 [tool.ruff]
 target-version = "py310"
