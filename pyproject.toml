@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "comet2txt"
-version = "1.0.0"
+version = "1.0.1"
 description = "Convert SAM Coupé Comet assembler source code to ASCII text"
 readme = "ReadMe.md"
 license = "MIT"

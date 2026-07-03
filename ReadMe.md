@@ -94,7 +94,7 @@ final 2 characters of long comments may be lost during printing.
 
 ## Links
 
-comet2txt - <https://github.com/simonowen/comet2txt/>
+comet2txt - <https://github.com/simonowen/comet2txt/>  
 pyz80 - <https://github.com/simonowen/pyz80/> (best used via VSCode extension)  
 SCADM - <https://www.worldofsam.org/products/scadm>  
 SimCoupe - <https://simonowen.com/simcoupe/>
